@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>newtons cannon</title>
+</head>
+
+<body style="
+    font-family:
+    sans-serif; 
+    font-size:15px; width:600px;
+    margin-left:auto;
+    margin-right:auto;
+    background-color:#c0c0c0;">
+
+    <h1 style="
+        font-size:24px;
+        text-align:center;
+        color:#800000;">Newtons Cannon</h1>
+    <div style="position:relative; width:500px; margin-left:auto; margin-right:auto;">
+        <img style="position:absolute;" src="NewtonDrawing.jpg" width="500" height="500">
+        <canvas style="position:relative;" id="theCanvas" width="500" height="500">
+            Canvas not supported; please update your browser.
+        </canvas>
+
+        <canvas style="position:absolute;" id="trailCanvas" width="500" height="500">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <p>This Simulation is MOPA</p>
+
+    <div style="
+            text-align: center;">
+        <input type="range" id="speedSlider" min="0" max="20000" step="100" value="3000" oninput="showSpeed();"
+            onchange=" showSpeed();" onclick="fireProjectile();">
+        Initial speed = <span id="speedReadout">3000</span> m/s
+        <script>
+            var speedReadout = document.getElementById("speedReadout");
+            var speedSlider = document.getElementById("speedSlider");
+            timer = window.setTimeout(moveProjectile, 1000 / 30);
+
+            function showSpeed() {
+                speedReadout.innerHTML = speedSlider.value;
+            }
+
+            function fireProjectile() {
+                x = 0;
+                y = earthRadius + mountainHeight;
+                vx = Number(speedSlider.value);
+                vy = 0;
+                moveProjectile();
+                window.clearTimeout(timer);
+            }</script>
+
+    </div>
+
+    <a href="http://physics.weber.edu/">Click here!</a>
+
+
+    <script>
+
+        var theCanvas = document.getElementById("theCanvas");
+        var theContext = theCanvas.getContext("2d");
+        var theCanvas = document.getElementById("trailCanvas");
+        var trailContext = trailCanvas.getContext("2d");
+        var x = 300;
+        var y = 50;
+        var vx = 6000; // meters per second
+        var vy = 0;
+        var earthRadius = 6371000; // meters
+        var mountainHeight = earthRadius * 0.165; // chosen to match image
+        var x = 0;
+        var y = earthRadius + mountainHeight;
+        var metersPerPixel = earthRadius / (0.355 * theCanvas.width);
+        var pixelX = theCanvas.width / 2 + x / metersPerPixel;
+        var pixelY = theCanvas.height / 2 - y / metersPerPixel;
+
+
+
+        function drawProjectile() {
+            theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+            theContext.beginPath();
+            theContext.arc(pixelX, pixelY, 5, 0, 2 * Math.PI);
+            theContext.fillStyle = "red";
+            theContext.fill();
+            trailContext.fillRect(pixelX - 0.5, pixelY - 0.5, 1, 1);
+        }
+
+        function moveProjectile() {
+            var newtonG = 6.67e-11; // grav. constant in SI units
+            var earthMass = 5.97e24; // kilograms
+            var dt = 5; // time step in seconds
+            var r = Math.sqrt(x * x + y * y);
+            if (r > earthRadius) {
+                var accel = newtonG * earthMass / (r * r); // magnitude of a
+                var ax = -accel * x / r;
+                var ay = -accel * y / r;
+                vx += ax * dt;
+                vy += ay * dt;
+                var lastx = x;
+                x += vx * dt;
+                y += vy * dt;
+                pixelX = theCanvas.width / 2 + x / metersPerPixel;
+                pixelY = theCanvas.height / 2 - y / metersPerPixel;
+                drawProjectile();
+                if (!((lastx < 0) && (x >= 0))) {
+                    window.setTimeout(moveProjectile, 1000 / 30);
+                }
+                window.setTimeout(moveProjectile, 1000 / 30);
+            }
+        }
+        moveProjectile();
+
+    </script>
+</body>
+
+</html>
